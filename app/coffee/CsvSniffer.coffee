@@ -1,13 +1,14 @@
 Errors = require './Errors'
-CsvSniffer = require('csv-sniffer')()
+logger = require "logger-sharelatex"
 fs = require 'fs'
+npmCSVSniffer = require('csv-sniffer')()
 
-_sniff_size_in_bytes = 1000
+_sniff_size_in_bytes = 400
 
 module.exports = CsvSniffer =
 
 	sniff: (file_path, callback) ->
-		sniffer = new CsvSniffer()
+		sniffer = new npmCSVSniffer()
 		fs.open file_path, 'r', (err, fd) ->
 			callback(err, null) if err?
 			fs.read fd, new Buffer(_sniff_size_in_bytes), 0, _sniff_size_in_bytes, 0, (err, bytes_read, data) ->
