@@ -18,6 +18,17 @@ describe "CsvSniffer", ->
 			"csv-sniffer": require('csv-sniffer')
 			"fs": require('fs')
 
+	describe "with a missing csv file", ->
+
+		beforeEach ->
+			@file_path = fixture_path + 'a_file_which_does_not_exist.csv'
+
+		it "should produce an error", (done) ->
+			@CsvSniffer.sniff @file_path, (err, data) ->
+				expect(err).to.not.equal null
+				err.code.should.equal 'ENOENT'
+				done()
+
 	describe "with a simple csv file", ->
 
 		beforeEach ->
