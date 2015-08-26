@@ -18,17 +18,6 @@ describe "CsvSniffer", ->
 			"csv-sniffer": require('csv-sniffer')
 			"fs": require('fs')
 
-	describe "with a missing csv file", ->
-
-		beforeEach ->
-			@file_path = fixture_path + 'a_file_which_does_not_exist.csv'
-
-		it "should produce an error", (done) ->
-			@CsvSniffer.sniff @file_path, (err, data) ->
-				expect(err).to.not.equal null
-				err.code.should.equal 'ENOENT'
-				expect(data).to.equal null
-				done()
 
 	describe "with a simple csv file", ->
 
@@ -90,4 +79,48 @@ describe "CsvSniffer", ->
 		it "should get the line separator", (done) ->
 			@CsvSniffer.sniff @file_path, (err, data) ->
 				expect(data.newlineStr).to.equal '\n'
+				done()
+
+	describe "with an invalid csv file", ->
+
+		beforeEach ->
+			@file_path = fixture_path + 'invalid.csv'
+
+		it "should not produce an error", (done) ->
+			@CsvSniffer.sniff @file_path, (err, data) ->
+				expect(err).to.equal null
+				done()
+
+		it "should not report any warnings", (done) ->
+			@CsvSniffer.sniff @file_path, (err, data) ->
+				data.warnings.should.be.Array
+				data.warnings.length.should.equal 0
+				done()
+
+		it "should not find a delimiter", (done) ->
+			@CsvSniffer.sniff @file_path, (err, data) ->
+				expect(data.delimiter).to.equal null
+				done()
+
+		it "should not find a quote char", (done) ->
+			@CsvSniffer.sniff @file_path, (err, data) ->
+				expect(data.quoteChar).to.equal null
+				done()
+
+		it "should get the line separator", (done) ->
+			@CsvSniffer.sniff @file_path, (err, data) ->
+				expect(data.newlineStr).to.equal '\n'
+				done()
+
+
+	describe "with a missing csv file", ->
+
+		beforeEach ->
+			@file_path = fixture_path + 'a_file_which_does_not_exist.csv'
+
+		it "should produce an error", (done) ->
+			@CsvSniffer.sniff @file_path, (err, data) ->
+				expect(err).to.not.equal null
+				err.code.should.equal 'ENOENT'
+				expect(data).to.equal null
 				done()
