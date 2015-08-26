@@ -4,11 +4,12 @@ fs = require 'fs'
 npmCSVSniffer = require('csv-sniffer')()
 
 _sniff_size_in_bytes = 400
+_delimiters = [',', ';', '	']
 
 module.exports = CsvSniffer =
 
 	sniff: (file_path, callback) ->
-		sniffer = new npmCSVSniffer()
+		sniffer = new npmCSVSniffer(_delimiters)
 		fs.open file_path, 'r', (err, fd) ->
 			callback(err, null) if err?
 			fs.read fd, new Buffer(_sniff_size_in_bytes), 0, _sniff_size_in_bytes, 0, (err, bytes_read, data) ->
