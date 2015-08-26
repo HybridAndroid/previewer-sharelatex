@@ -27,6 +27,7 @@ describe "CsvSniffer", ->
 			@CsvSniffer.sniff @file_path, (err, data) ->
 				expect(err).to.not.equal null
 				err.code.should.equal 'ENOENT'
+				expect(data).to.equal null
 				done()
 
 	describe "with a simple csv file", ->
