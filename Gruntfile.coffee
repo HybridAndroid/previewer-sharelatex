@@ -50,6 +50,10 @@ module.exports = (grunt) ->
 			app:
 				src: "app.js"
 
+		watch:
+			server_coffee:
+				files: ['app/*.coffee', 'app/**/*.coffee', 'test/unit/coffee/*.coffee', 'app.coffee', 'cluster.coffee']
+				tasks: ['clean', 'coffee', 'test:unit']
 		mochaTest:
 			unit:
 				options:
@@ -70,6 +74,7 @@ module.exports = (grunt) ->
 
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-contrib-clean'
+	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.loadNpmTasks 'grunt-mocha-test'
 	grunt.loadNpmTasks 'grunt-shell'
 	grunt.loadNpmTasks 'grunt-execute'
