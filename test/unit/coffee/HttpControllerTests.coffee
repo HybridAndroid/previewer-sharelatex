@@ -13,6 +13,7 @@ describe "HttpController", ->
 		@HttpController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex": @logger = { log: sinon.stub(), setHeader: sinon.stub() }
 			"./Errors": @Errors = {}
+			"./CsvPreviewer": @CsvPreviewer = {}
 		@req = {}
 		@res = {}
 

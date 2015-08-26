@@ -1,5 +1,6 @@
 logger = require "logger-sharelatex"
 Errors = require "./Errors"
+CsvPreviewer = require "./CsvPreviewer"
 
 module.exports = HttpController =
 
@@ -11,4 +12,11 @@ module.exports = HttpController =
 		fileUrl = req.query.fileUrl
 		logger.log fileUrl: fileUrl, "Generating preview for csv file"
 
-		res.send 200
+		CsvPreviewer.preview fileUrl, (err, preview)->
+			return next(err) if err?
+			res.setHeader 'Content-Type', 'application/json'
+			res.send HttpController._build_csv_preview(preview)
+
+	_build_csv_preview: (preview) ->
+		# Todo: project to the final preview format
+		preview
