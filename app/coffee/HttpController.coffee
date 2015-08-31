@@ -17,10 +17,16 @@ module.exports = HttpController =
 
 		FilestoreHandler.getSample file_url, (err, sample) ->
 			return next(err) if err?
-			CsvSniffer.sniff sample, (err, result) ->
+			CsvSniffer.sniff sample, (err, csv_details) ->
 				return next(err) if err?
-				res.json HttpController._build_csv_preview(result)
+				res.send HttpController._build_csv_preview(file_url, csv_details)
 
-	_build_csv_preview: (preview) ->
-		# Todo: project to the final preview format
-		preview
+	_build_csv_preview: (file_url, csv_details) ->
+		# Todo: project to the final csv_details format
+		source: file_url,
+		rows: csv_details.records,
+		delimiter: csv_details.delimiter,
+		quoteChar: csv_details.quoteChar,
+		newlineStr: csv_details.newlineStr,
+		types: csv_details.types,
+		labels: csv_details.labels
