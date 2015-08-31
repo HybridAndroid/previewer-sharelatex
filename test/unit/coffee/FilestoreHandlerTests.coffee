@@ -20,17 +20,34 @@ describe "FilestoreHandler", ->
 			"request": @request = sinon.stub()
 		@response =
 			statusCode: 200
+		@body = 'some response body'
 
 	describe "getSample", ->
 
+		beforeEach ->
+			@request.callsArgWith(1, null, @response, @body)
+
+		it "should issue a get request", (done) ->
+			@FilestoreHandler.getSample @uri, (err, data) =>
+				expect(@request.lastCall.args[0].method).to.equal 'get'
+				done()
+
 		it "should include range header in request to filestore", (done) ->
-			@request.callsArgWith(1, null, @response, "wat")
 			@FilestoreHandler.getSample @uri, (err, data) =>
 				expect(@request.lastCall.args[0].headers.Range).to.equal "bytes=0-#{1024 * 16}"
 				done()
 
+		# Error conditions
+		it "should produce an error if the response status is not 200", (done) ->
+			@response.statusCode = 500
+			@request.callsArgWith(1, null, @response, @body)
+			@FilestoreHandler.getSample @uri, (err, data) ->
+				expect(data).to.equal null
+				expect(err).to.not.equal null
+				done()
+
 		it "should produce an error if the request errors", (done) ->
-			@request.callsArgWith(1, new Error('woops'), @response, "")
+			@request.callsArgWith(1, new Error('woops'), @response, @body)
 			@FilestoreHandler.getSample @uri, (err, data) ->
 				expect(data).to.equal null
 				expect(err).to.not.equal null
