@@ -33,23 +33,26 @@ describe "HttpController", ->
 		describe "with a fileUrl query parameter", ->
 
 			it "should produce a 200 response", (done) ->
-				@res.send = (code, data) =>
-					code.should.equal 200
-					data.source.should.equal @file_url
-					data.delimiter.should.equal ','
-					done()
+				@res.status = (code) =>
+					send: (data) =>
+						code.should.equal 200
+						data.source.should.equal @file_url
+						data.delimiter.should.equal ','
+						done()
 				@HttpController.previewCsv @req, @res
 
 			it "should use the fileUrl query to get Sample from Filestore", (done) ->
-				@res.send = (code, data) =>
-					@FilestoreHandler.getSample.calledWith(@file_url).should.equal true
-					done()
+				@res.status = (code) =>
+					send: (data) =>
+						@FilestoreHandler.getSample.calledWith(@file_url).should.equal true
+						done()
 				@HttpController.previewCsv @req, @res
 
 			it "should provide the sample data to the CsvSniffer", (done) ->
-				@res.send = (code, data) =>
-					@CsvSniffer.sniff.calledWith('somedata').should.equal true
-					done()
+				@res.status = (code) =>
+					send: (data) =>
+						@CsvSniffer.sniff.calledWith('somedata').should.equal true
+						done()
 				@HttpController.previewCsv @req, @res
 
 		describe "without a fileUrl", ->
@@ -58,9 +61,10 @@ describe "HttpController", ->
 				@req.query = {}
 
 			it "should produce an error code", (done) ->
-				@res.send = (code) =>
-					code.should.equal 400
-					done()
+				@res.status = (code) =>
+					send: (data) =>
+						code.should.equal 400
+						done()
 				@HttpController.previewCsv @req, @res
 
 	describe "_build_csv_preview", ->
