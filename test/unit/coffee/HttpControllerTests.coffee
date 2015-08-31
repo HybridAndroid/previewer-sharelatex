@@ -49,7 +49,7 @@ describe "HttpController", ->
 
 			it "should produce an error code", (done) ->
 				@res.send = (code) =>
-					code.should.equal 500
+					code.should.equal 400
 					done()
 				@HttpController.previewCsv @req, @res
 
