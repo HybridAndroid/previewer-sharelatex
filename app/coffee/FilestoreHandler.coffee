@@ -1,17 +1,26 @@
 logger = require("logger-sharelatex")
-fs = require("fs")
 request = require("request")
-settings = require("settings-sharelatex")
+FileStoreError = require('./Errors').FileStoreError
 
 oneMinInMs = 60 * 1000
 fiveMinsInMs = oneMinInMs * 5
 
+max_bytes = 1024 * 16 # 16k
+
 module.exports = FileStoreHandler =
 
-	getFileStream: (fileUrl, callback) ->
+	getSample: (fileUrl, callback) ->
 		opts =
 			method: 'get'
 			uri: fileUrl
 			timeout: fiveMinsInMs
-		readStream = request(opts)
-		callback(null, readStream)
+			headers: {'Range': "bytes=0-#{max_bytes}"}
+		logger.log options: opts, "getting sample of file from filestore"
+		request opts, (err, response, body) ->
+			if err?
+				callback err, null
+			else if response.statusCode != 200
+				err = new FileStoreError("Unexpected response code from filestore: #{response.statusCode}")
+				callback(err, body)
+			else
+				callback null, body
