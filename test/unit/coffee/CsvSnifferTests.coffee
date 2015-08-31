@@ -30,6 +30,13 @@ describe "CsvSniffer", ->
 					expect(err).to.equal null
 					done()
 
+		it "should find an array of records from the file", (done) ->
+			fs.readFile @file_path, {encoding: 'utf8'}, (err, sample) =>
+				@CsvSniffer.sniff sample, (err, data) =>
+					expect(data.records).to.not.equal null
+					expect(data.records.length).to.equal 5
+					done()
+
 		it "should not report any warnings", (done) ->
 			fs.readFile @file_path, {encoding: 'utf8'}, (err, sample) =>
 				@CsvSniffer.sniff sample, (err, data) ->
