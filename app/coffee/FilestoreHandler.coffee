@@ -9,18 +9,21 @@ max_bytes = 1024 * 16 # 16k
 
 module.exports = FileStoreHandler =
 
-	getSample: (fileUrl, callback) ->
+	getSample: (file_url, callback) ->
 		opts =
 			method: 'get'
-			uri: fileUrl
+			uri: file_url
 			timeout: fiveMinsInMs
 			headers: {'Range': "bytes=0-#{max_bytes}"}
 		logger.log options: opts, "getting sample of file from filestore"
 		request opts, (err, response, body) ->
 			if err?
+				logger.log file_url: file_url, "error getting sample from filestore"
 				callback err, null
 			else if response.statusCode != 200
+				logger.log file_url: file_url, code: response.statusCode, "filestore responded with non-ok status"
 				err = new FileStoreError("Unexpected response code from filestore: #{response.statusCode}")
-				callback(err, body)
+				callback(err, null)
 			else
+				logger.log file_url: file_url, "got sample from filestore"
 				callback null, body
