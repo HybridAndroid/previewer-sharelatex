@@ -5,10 +5,6 @@ CsvSniffer = require './CsvSniffer'
 
 module.exports = HttpController =
 
-	something: (req, res) ->
-		logger.log "Something works"
-		res.send 200
-
 	previewCsv: (req, res, next = (error) ->) ->
 		file_url = req.query.fileUrl
 		# fixture for debugging

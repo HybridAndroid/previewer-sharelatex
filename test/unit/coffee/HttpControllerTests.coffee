@@ -16,15 +16,6 @@ describe "HttpController", ->
 		@req = {}
 		@res = {}
 
-	describe "something", ->
-
-		it "should send 200 response", (done) ->
-			@res.send = (code) =>
-				code.should.equal(200)
-				@logger.log.calledWith("Something works").should.equal true
-				done()
-			@HttpController.something @req, @res
-
 	describe "_build_csv_preview", ->
 
 		beforeEach ->

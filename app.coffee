@@ -24,7 +24,6 @@ app.use Metrics.http.monitor(logger)
 
 
 # Do routing here, example:
-app.get '/something', HttpController.something
 app.get '/preview/csv', HttpController.previewCsv
 
 
