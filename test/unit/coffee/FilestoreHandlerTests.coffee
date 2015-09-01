@@ -17,6 +17,7 @@ describe "FilestoreHandler", ->
 			"logger-sharelatex": @logger = { log: sinon.stub(), setHeader: sinon.stub() }
 			"./Errors": @Errors =
 				FileStoreError: sinon.stub()
+				NotFoundError: sinon.stub()
 			"request": @request = sinon.stub()
 		@response =
 			statusCode: 200
@@ -44,6 +45,14 @@ describe "FilestoreHandler", ->
 			@FilestoreHandler.getSample @uri, (err, data) ->
 				expect(data).to.equal null
 				expect(err).to.not.equal null
+				done()
+
+		it "should produce a NotFoundError when the response code is 404", (done) ->
+			@response.statusCode = 404
+			@request.callsArgWith(1, null, @response, @body)
+			@FilestoreHandler.getSample @uri, (err, data) =>
+				expect(err).to.not.equal null
+				expect(err instanceof @Errors.NotFoundError).to.equal true
 				done()
 
 		it "should produce an error if the request errors", (done) ->

@@ -26,7 +26,7 @@ module.exports = FileStoreHandler =
 				callback(err, null)
 			else if response.statusCode != 200
 				logger.log file_url: file_url, code: response.statusCode, "filestore responded with non-ok status"
-				err = new FileStoreError("Unexpected response code from filestore: #{response.statusCode}")
+				err = new Errors.FileStoreError("Unexpected response code from filestore: #{response.statusCode}")
 				callback(err, null)
 			else
 				logger.log file_url: file_url, "got sample from filestore"
