@@ -18,6 +18,8 @@ describe "HttpController", ->
 				sniff: sinon.stub()
 			"./Errors": @Errors =
 				NotFoundError: sinon.stub()
+			"metrics-sharelatex":
+				inc: sinon.stub()
 		@req = {}
 		@res = {send: ->}
 		@file_url = "http://example.com/someFile.csv"

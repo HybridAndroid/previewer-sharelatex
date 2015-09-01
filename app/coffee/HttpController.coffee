@@ -2,6 +2,7 @@ logger = require "logger-sharelatex"
 Errors = require "./Errors"
 FilestoreHandler = require './FilestoreHandler'
 CsvSniffer = require './CsvSniffer'
+metrics = require 'metrics-sharelatex'
 
 module.exports = HttpController =
 
@@ -13,6 +14,7 @@ module.exports = HttpController =
 			logger.log "no fileUrl query parameter supplied"
 			return res.status(400).send("required query param 'fileUrl' missing")
 		logger.log file_url: file_url, "Generating preview for csv file"
+		metrics.inc "getPreviewCsv"
 		FilestoreHandler.getSample file_url, (err, sample) ->
 			if err?
 				if err instanceof Errors.NotFoundError
