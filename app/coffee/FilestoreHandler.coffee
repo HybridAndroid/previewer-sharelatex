@@ -1,6 +1,6 @@
 logger = require("logger-sharelatex")
 request = require("request")
-FileStoreError = require('./Errors').FileStoreError
+Errors = require('./Errors')
 
 oneMinInMs = 60 * 1000
 fiveMinsInMs = oneMinInMs * 5
@@ -20,6 +20,10 @@ module.exports = FileStoreHandler =
 			if err?
 				logger.log file_url: file_url, "error getting sample from filestore"
 				callback err, null
+			else if response.statusCode == 404
+				logger.log file_url: file_url, "filestore could not find file"
+				err = new Errors.NotFoundError()
+				callback(err, null)
 			else if response.statusCode != 200
 				logger.log file_url: file_url, code: response.statusCode, "filestore responded with non-ok status"
 				err = new FileStoreError("Unexpected response code from filestore: #{response.statusCode}")

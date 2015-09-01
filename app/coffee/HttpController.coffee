@@ -14,7 +14,11 @@ module.exports = HttpController =
 			return res.status(400).send("required query param 'fileUrl' missing")
 		logger.log file_url: file_url, "Generating preview for csv file"
 		FilestoreHandler.getSample file_url, (err, sample) ->
-			return next(err) if err?
+			if err?
+				if err instanceof Errors.NotFoundError
+					return res.send 404
+				else
+					return next(err)
 			logger.log file_url: file_url, 'sniffing csv sample'
 			CsvSniffer.sniff sample, (err, csv_details) ->
 				if err?
