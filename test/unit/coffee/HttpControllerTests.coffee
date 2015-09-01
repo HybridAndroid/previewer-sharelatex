@@ -16,7 +16,8 @@ describe "HttpController", ->
 				getSample: sinon.stub()
 			"./CsvSniffer": @CsvSniffer =
 				sniff: sinon.stub()
-			"./Errors": @Errors = {}
+			"./Errors": @Errors =
+				NotFoundError: sinon.stub()
 		@req = {}
 		@res = {send: ->}
 		@file_url = "http://example.com/someFile.csv"
@@ -66,6 +67,16 @@ describe "HttpController", ->
 						code.should.equal 400
 						done()
 				@HttpController.previewCsv @req, @res
+
+		describe "when the filestore cannot find the file", ->
+
+			it "should produce a 404 response", (done) ->
+				@FilestoreHandler.getSample.callsArgWith(1, new @Errors.NotFoundError(), null)
+				@res.send = (code) =>
+					code.should.equal 404
+					done()
+				@HttpController.previewCsv @req, @res
+
 
 	describe "_build_csv_preview", ->
 
