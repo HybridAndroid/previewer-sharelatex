@@ -35,11 +35,19 @@ describe "CsvSniffer", ->
 					expect(err).to.equal null
 					done()
 
-		it "should find an array of records from the file", (done) ->
+		it "should find an array of seven records from the file", (done) ->
 			@load @file_path, (sample) =>
 				@CsvSniffer.sniff sample, (err, data) =>
 					expect(data.records).to.not.equal null
-					expect(data.records.length).to.equal 5
+					expect(data.records.length).to.equal 7
+					done()
+
+		it "should find a row of labels at the top of the file", (done) ->
+			@load @file_path, (sample) =>
+				@CsvSniffer.sniff sample, (err, data) =>
+					expect(data.labels).to.not.equal null
+					expect(data.labels.length).to.equal 12
+					expect(data.labels[0]).to.equal "street"
 					done()
 
 		it "should not report any warnings", (done) ->
