@@ -74,7 +74,7 @@ describe "HttpController", ->
 
 			it "should produce a 404 response", (done) ->
 				@FilestoreHandler.getSample.callsArgWith(1, new @Errors.NotFoundError(), null)
-				@res.send = (code) =>
+				@res.sendStatus = (code) =>
 					code.should.equal 404
 					done()
 				@HttpController.previewCsv @req, @res
