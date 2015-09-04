@@ -62,3 +62,14 @@ describe "Previewer", ->
 			expect(err).to.equal null
 			response.statusCode.should.equal 200
 			done()
+
+	it "should produce an error for an unknown file", (done) ->
+		file_url = "http://#{@filestore_host}:#{@filestore_port}/file/this_clearly_does_not_exist.csv"
+		opts = {
+			uri: "http://#{@previewer_host}:#{@previewer_port}/preview/csv?fileUrl=#{file_url}"
+			method: 'get'
+		}
+		request opts, (err, response, body) =>
+			expect(err).to.equal null
+			response.statusCode.should.equal 500
+			done()
