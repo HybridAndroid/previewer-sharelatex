@@ -8,30 +8,34 @@ request = require("request")
 settings = require("settings-sharelatex")
 express = require('express')
 Router = require('../../../app/js/Router')
-
+FakeFileStore = require('./helpers/FakeFileStore')
 
 describe "Previewer", ->
 
 	before (done)->
-		# @requires =
-		# 	"metrics-sharelatex": @metrics =
-		# 		inc: ->
-		# 	"settings-sharelatex": @settings = {}
-		# 	"logger-sharelatex": @logger = { log: sinon.stub(), setHeader: sinon.stub() }
-		# 	"metrics-sharelatex":
-		# 		inc: sinon.stub()
+
+		# start a fake FileStore service
+		@filestore_host = 'localhost'
+		@filestore_port = 9092
+		@filestore_app = FakeFileStore()
+		@filestore_server = @filestore_app.listen @filestore_port, @filestore_host, (err) =>
+			throw err if err?
+			console.log ">> test filestore started on #{@filestore_host}:#{@filestore_port}"
+
+		# set up a Previewer test app
 		@previewer_host = 'localhost'
 		@previewer_port = 9091
-		@app = express()
-		@app.name = 'test_previewer'
-		Router(@app)
-		@server = @app.listen @previewer_port, @previewer_host, (err) ->
+		@previewer_app = express()
+		@previewer_app.name = 'test_previewer'
+		Router(@previewer_app)
+		@previewer_server = @previewer_app.listen @previewer_port, @previewer_host, (err) =>
 			throw err if err?
-			console.log ">> test previewer started on #{previewer_host}/#{previewer_port}"
+			console.log ">> test previewer started on #{@previewer_host}:#{@previewer_port}"
 		done()
 
 	after (done) ->
-		@server.close()
+		@previewer_server.close()
+		@filestore_server.close()
 		done()
 
 	it "should something", (done)->
@@ -43,8 +47,18 @@ describe "Previewer", ->
 			uri: "http://#{@previewer_host}:#{@previewer_port}/status"
 			method: 'get'
 		}
-		console.log opts
 		request opts, (err, response, body) =>
 			expect(response.statusCode).to.equal 200
-			expect(body).to.equal "#{@app.name} is alive"
+			expect(body).to.equal "#{@previewer_app.name} is alive"
+			done()
+
+	it "should get a preview of a good csv file", (done) ->
+		file_url = "http://#{@filestore_host}:#{@filestore_port}/file/simple.csv"
+		opts = {
+			uri: "http://#{@previewer_host}:#{@previewer_port}/preview/csv?fileUrl=#{file_url}"
+			method: 'get'
+		}
+		request opts, (err, response, body) =>
+			expect(err).to.equal null
+			response.statusCode.should.equal 200
 			done()
