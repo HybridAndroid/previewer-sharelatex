@@ -56,16 +56,26 @@ describe "Previewer", ->
 
 	describe "/preview/csv", ->
 
-		it "should get a preview of a good csv file", (done) ->
-			file_url = "#{@filestore_url}/file/simple.csv"
-			opts = {
-				uri: "#{@previewer_url}/preview/csv?fileUrl=#{file_url}"
-				method: 'get'
-			}
-			request opts, (err, response, body) =>
-				expect(err).to.equal null
-				response.statusCode.should.equal 200
-				done()
+		describe "with a good csv file", (done) ->
+
+			beforeEach ->
+				@file_url = "#{@filestore_url}/file/simple.csv"
+				@opts = {
+					uri: "#{@previewer_url}/preview/csv?fileUrl=#{@file_url}"
+					method: 'get'
+					json: true
+				}
+
+			it "should produce a 200 response", (done) ->
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 200
+					done()
+
+			it "should have a source attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.source).to.equal @file_url
+					done()
 
 		describe "with a non-existant file", ->
 

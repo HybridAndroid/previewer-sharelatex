@@ -24,6 +24,7 @@ module.exports = HttpController =
 				if err?
 					logger.log file_url: file_url, error_message: error.message, "failed to sniff csv sample"
 					return next(err)
+				res.setHeader "Content-Type", "application/json"
 				res.status(200).send(HttpController._build_csv_preview(file_url, csv_details))
 
 	_build_csv_preview: (file_url, csv_details) ->

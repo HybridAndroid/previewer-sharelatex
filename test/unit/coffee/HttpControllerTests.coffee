@@ -21,7 +21,9 @@ describe "HttpController", ->
 			"metrics-sharelatex":
 				inc: sinon.stub()
 		@req = {}
-		@res = {send: ->}
+		@res =
+			send: ->
+			setHeader: ->
 		@file_url = "http://example.com/someFile.csv"
 		@req.query =
 			fileUrl: @file_url
