@@ -31,7 +31,10 @@ describe "Previewer", ->
 		@previewer_server = @previewer_app.listen @previewer_port, @previewer_host, (err) =>
 			throw err if err?
 			console.log ">> test previewer started on #{@previewer_host}:#{@previewer_port}"
+		@filestore_url = "http://#{@filestore_host}:#{@filestore_port}"
+		@previewer_url = "http://#{@previewer_host}:#{@previewer_port}"
 		done()
+
 
 	after (done) ->
 		# shut down both express apps
@@ -43,7 +46,7 @@ describe "Previewer", ->
 
 		it "should respond to status endpoint", (done) ->
 			opts = {
-				uri: "http://#{@previewer_host}:#{@previewer_port}/status"
+				uri: "#{@previewer_url}/status"
 				method: 'get'
 			}
 			request opts, (err, response, body) =>
@@ -54,9 +57,9 @@ describe "Previewer", ->
 	describe "/preview/csv", ->
 
 		it "should get a preview of a good csv file", (done) ->
-			file_url = "http://#{@filestore_host}:#{@filestore_port}/file/simple.csv"
+			file_url = "#{@filestore_url}/file/simple.csv"
 			opts = {
-				uri: "http://#{@previewer_host}:#{@previewer_port}/preview/csv?fileUrl=#{file_url}"
+				uri: "#{@previewer_url}/preview/csv?fileUrl=#{file_url}"
 				method: 'get'
 			}
 			request opts, (err, response, body) =>
@@ -65,9 +68,9 @@ describe "Previewer", ->
 				done()
 
 		it "should produce a 404 for a non-existant file", (done) ->
-			file_url = "http://#{@filestore_host}:#{@filestore_port}/file/this_clearly_does_not_exist.csv"
+			file_url = "#{@filestore_url}/file/this_clearly_does_not_exist.csv"
 			opts = {
-				uri: "http://#{@previewer_host}:#{@previewer_port}/preview/csv?fileUrl=#{file_url}"
+				uri: "#{@previewer_url}/preview/csv?fileUrl=#{file_url}"
 				method: 'get'
 			}
 			request opts, (err, response, body) =>
@@ -79,7 +82,7 @@ describe "Previewer", ->
 
 			it "should produce a 400 response", (done) ->
 				opts = {
-					uri: "http://#{@previewer_host}:#{@previewer_port}/preview/csv?wat=yes"
+					uri: "#{@previewer_url}/preview/csv?wat=yes"
 					method: 'get'
 				}
 				request opts, (err, response, body) =>
