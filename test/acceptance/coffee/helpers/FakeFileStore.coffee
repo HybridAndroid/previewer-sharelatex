@@ -13,7 +13,7 @@ module.exports = FakeFileStore = () ->
 			stream = fs.createReadStream file_path
 			stream.on 'error', (err) ->
 				if err.code == 'ENOENT'
-					return res.sendStatus 40
+					return res.sendStatus 404
 				res.sendStatus 500
 			stream.pipe(res)
 

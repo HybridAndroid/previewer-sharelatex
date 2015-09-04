@@ -16,7 +16,7 @@ module.exports = HttpController =
 		FilestoreHandler.getSample file_url, (err, sample) ->
 			if err?
 				if err instanceof Errors.NotFoundError
-					return res.send 404
+					return res.sendStatus 404
 				else
 					return next(err)
 			logger.log file_url: file_url, 'sniffing csv sample'

@@ -72,5 +72,17 @@ describe "Previewer", ->
 			}
 			request opts, (err, response, body) =>
 				expect(err).to.equal null
-				response.statusCode.should.equal 500
+				response.statusCode.should.equal 404
 				done()
+
+		describe "without a fileUrl query param", ->
+
+			it "should produce a 400 response", (done) ->
+				opts = {
+					uri: "http://#{@previewer_host}:#{@previewer_port}/preview/csv?wat=yes"
+					method: 'get'
+				}
+				request opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 400
+					done()
