@@ -67,16 +67,18 @@ describe "Previewer", ->
 				response.statusCode.should.equal 200
 				done()
 
-		it "should produce a 404 for a non-existant file", (done) ->
-			file_url = "#{@filestore_url}/file/this_clearly_does_not_exist.csv"
-			opts = {
-				uri: "#{@previewer_url}/preview/csv?fileUrl=#{file_url}"
-				method: 'get'
-			}
-			request opts, (err, response, body) =>
-				expect(err).to.equal null
-				response.statusCode.should.equal 404
-				done()
+		describe "with a non-existant file", ->
+
+			it "should produce a 404", (done) ->
+				file_url = "#{@filestore_url}/file/this_clearly_does_not_exist.csv"
+				opts = {
+					uri: "#{@previewer_url}/preview/csv?fileUrl=#{file_url}"
+					method: 'get'
+				}
+				request opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 404
+					done()
 
 		describe "without a fileUrl query param", ->
 
