@@ -8,8 +8,6 @@ module.exports = HttpController =
 
 	previewCsv: (req, res, next = (error) ->) ->
 		file_url = req.query.fileUrl
-		# fixture for debugging
-		# file_url = 'http://localhost:3009/project/55dc2645c75625e45a722907/file/55deec7f3def1dd5f3c31558'
 		if !file_url?
 			logger.log "no fileUrl query parameter supplied"
 			return res.status(400).send("required query param 'fileUrl' missing")
