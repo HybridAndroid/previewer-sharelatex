@@ -5,7 +5,7 @@ bodyParser = require "body-parser"
 Errors     = require "./app/js/Errors"
 Metrics    = require "metrics-sharelatex"
 Path       = require "path"
-HttpController = require "./app/js/HttpController"
+Router     = require "./app/js/Router"
 
 
 app_name = "previewer"
@@ -18,18 +18,13 @@ Metrics.event_loop?.monitor(logger)
 
 
 app = express()
-
+app.name = 'previewer'
 
 app.use Metrics.http.monitor(logger)
 
 
-# Do routing here, example:
-app.get '/preview/csv', HttpController.previewCsv
-
-
-# Status Endpoint
-app.get '/status', (req, res)->
-	res.send("#{app_name} is alive")
+# Do routing here
+Router(app)
 
 
 # Error handler
