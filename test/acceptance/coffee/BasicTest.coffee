@@ -35,7 +35,6 @@ describe "Previewer", ->
 		@previewer_url = "http://#{@previewer_host}:#{@previewer_port}"
 		done()
 
-
 	after (done) ->
 		# shut down both express apps
 		@previewer_server.close()
@@ -90,6 +89,34 @@ describe "Previewer", ->
 					expect(body.labels.length).to.equal 12
 					done()
 
+		describe "with a quoted csv file", (done) ->
+
+			beforeEach ->
+				@file_url = "#{@filestore_url}/file/simple_quoted.csv"
+				@opts =
+					uri: "#{@previewer_url}/preview/csv?fileUrl=#{@file_url}"
+					method: 'get'
+					json: true
+
+			it "should produce a 200 response", (done) ->
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 200
+					done()
+
+			it "should have an array of rows", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.rows).to.be.Array
+					expect(body.rows.length).to.equal 4
+					body.rows.forEach (row) ->
+						expect(row.length).to.equal 12
+					done()
+
+			it "should have an array of labels", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.labels).to.be.Array
+					expect(body.labels.length).to.equal 12
+					done()
 		describe "with a non-existant file", ->
 
 			it "should produce a 404", (done) ->
