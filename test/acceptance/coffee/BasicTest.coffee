@@ -89,6 +89,16 @@ describe "Previewer", ->
 					expect(body.labels.length).to.equal 12
 					done()
 
+			it "should have a null quoteChar property", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.quoteChar).to.equal null
+					done()
+
+			it "should have a delimiter property", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.delimiter).to.equal ','
+					done()
+
 		describe "with a quoted csv file", (done) ->
 
 			beforeEach ->
@@ -117,6 +127,17 @@ describe "Previewer", ->
 					expect(body.labels).to.be.Array
 					expect(body.labels.length).to.equal 12
 					done()
+
+			it "should have a quoteChar property", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.quoteChar).to.equal '"'
+					done()
+
+			it "should have a delimiter property", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.delimiter).to.equal ','
+					done()
+
 		describe "with a non-existant file", ->
 
 			it "should produce a 404", (done) ->
