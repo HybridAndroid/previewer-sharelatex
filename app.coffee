@@ -18,7 +18,7 @@ Metrics.event_loop?.monitor(logger)
 
 
 app = express()
-app.name = 'previewer'
+app.locals.app_name = app_name
 
 app.use Metrics.http.monitor(logger)
 

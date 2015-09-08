@@ -26,7 +26,7 @@ describe "Previewer", ->
 		@previewer_host = 'localhost'
 		@previewer_port = 9091
 		@previewer_app = express()
-		@previewer_app.name = 'test_previewer'
+		@previewer_app.locals.app_name = 'test_previewer'
 		Router(@previewer_app)
 		@previewer_server = @previewer_app.listen @previewer_port, @previewer_host, (err) =>
 			throw err if err?
@@ -50,7 +50,8 @@ describe "Previewer", ->
 			}
 			request opts, (err, response, body) =>
 				expect(response.statusCode).to.equal 200
-				expect(body).to.equal "#{@previewer_app.name} is alive"
+				expect(body).to.equal "#{@previewer_app.locals.app_name} is alive"
+				expect(body).to.not.equal " is alive"
 				done()
 
 	describe "/preview/csv", ->
