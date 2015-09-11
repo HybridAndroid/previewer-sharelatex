@@ -20,15 +20,14 @@ module.exports = HttpController =
 				else
 					return next(err)
 			logger.log file_url: file_url, 'sniffing csv sample'
-			CsvSniffer.sniff sample, (err, csv_details) ->
+			CsvSniffer.sniff sample.data, (err, csv_details) ->
 				if err?
-					logger.log file_url: file_url, error_message: error.message, "failed to sniff csv sample"
+					logger.log file_url: file_url, error_message: err.message, "failed to sniff csv sample"
 					return next(err)
 				res.setHeader "Content-Type", "application/json"
-				res.status(200).send(HttpController._build_csv_preview(file_url, csv_details))
+				res.status(200).send(HttpController._build_csv_preview(file_url, csv_details, sample.truncated))
 
-	_build_csv_preview: (file_url, csv_details) ->
-		# Todo: project to the final csv_details format
+	_build_csv_preview: (file_url, csv_details, truncated) ->
 		source: file_url,
 		rows: csv_details.records,
 		delimiter: csv_details.delimiter,
@@ -36,3 +35,4 @@ module.exports = HttpController =
 		newlineStr: csv_details.newlineStr,
 		types: csv_details.types,
 		labels: csv_details.labels
+		truncated: truncated

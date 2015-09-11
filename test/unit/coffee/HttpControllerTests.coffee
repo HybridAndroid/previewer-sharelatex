@@ -27,7 +27,9 @@ describe "HttpController", ->
 		@file_url = "http://example.com/someFile.csv"
 		@req.query =
 			fileUrl: @file_url
-		@sample = 'somedata'
+		@sample =
+			data: 'somedata'
+			truncated: false
 		@details =
 			delimiter: ','
 		@FilestoreHandler.getSample.callsArgWith(1, null, @sample)

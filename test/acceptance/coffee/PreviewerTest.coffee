@@ -73,7 +73,14 @@ describe "Previewer", ->
 
 			it "should have a source attribute", (done) ->
 				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'source'
 					expect(body.source).to.equal @file_url
+					done()
+
+			it "should have a truncated attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'truncated'
+					expect(body.truncated).to.equal false
 					done()
 
 			it "should have an array of rows", (done) ->
