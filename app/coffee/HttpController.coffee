@@ -6,6 +6,23 @@ metrics = require 'metrics-sharelatex'
 
 module.exports = HttpController =
 
+	previewText: (req, res, next = (error) ->) ->
+		file_url = req.query.fileUrl
+		if !file_url?
+			logger.log "no fileUrl query parameter supplied"
+			return res.status(400).send("required query param 'fileUrl' missing")
+		logger.log file_url: file_url, "Generating preview for file"
+		metrics.inc "getPreview"
+		FilestoreHandler.getSample file_url, (err, sample) ->
+			if err?
+				if err instanceof Errors.NotFoundError
+					return res.sendStatus 404
+				else
+					return next(err)
+			logger.log file_url: file_url, 'sending preview to client'
+			res.setHeader "Content-Type", "application/json"
+			res.status(200).send({source: file_url, data: sample.data, truncated: sample.truncated})
+
 	previewCsv: (req, res, next = (error) ->) ->
 		file_url = req.query.fileUrl
 		if !file_url?
