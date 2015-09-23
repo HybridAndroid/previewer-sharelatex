@@ -8,3 +8,5 @@ module.exports = Router = (app) ->
 	app.get '/preview/csv', HttpController.previewCsv
 
 	app.get '/preview/text', HttpController.previewText
+
+	app.get '/preview', HttpController.preview
