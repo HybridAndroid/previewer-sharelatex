@@ -54,6 +54,124 @@ describe "Previewer", ->
 				expect(body).to.not.equal " is alive"
 				done()
 
+	describe "/preview", ->
+
+		describe "with a good csv file", (done) ->
+
+			beforeEach ->
+				@file_name = 'simple.csv'
+				@file_url = "#{@filestore_url}/file/#{@file_name}"
+				@opts =
+					uri: "#{@previewer_url}/preview?fileUrl=#{@file_url}&fileName=#{@file_name}"
+					method: 'get'
+					json: true
+
+			it "should produce a 200 response", (done) ->
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 200
+					done()
+
+			it "should have a source attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'source'
+					expect(body.source).to.equal @file_url
+					done()
+
+			it "should have a truncated attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'truncated'
+					expect(body.truncated).to.equal false
+					done()
+
+			it "should have a data attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'data'
+					done()
+
+			it "should have an array of rows", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.data.rows).to.be.Array
+					expect(body.data.rows.length).to.equal 7
+					body.data.rows.forEach (row) ->
+						expect(row.length).to.equal 12
+					done()
+
+			it "should have an array of labels", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.data.labels).to.be.Array
+					expect(body.data.labels.length).to.equal 12
+					done()
+
+		describe "with a quoted csv file", (done) ->
+
+			beforeEach ->
+				@file_name = 'simple_quoted.csv'
+				@file_url = "#{@filestore_url}/file/#{@file_name}"
+				@opts =
+					uri: "#{@previewer_url}/preview?fileUrl=#{@file_url}&fileName=#{@file_name}"
+					method: 'get'
+					json: true
+
+			it "should produce a 200 response", (done) ->
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 200
+					done()
+
+			it "should have an array of rows", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.data.rows).to.be.Array
+					expect(body.data.rows.length).to.equal 4
+					body.data.rows.forEach (row) ->
+						expect(row.length).to.equal 12
+					done()
+
+			it "should have an array of labels", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.data.labels).to.be.Array
+					expect(body.data.labels.length).to.equal 12
+					done()
+
+		describe "with a non-existant file", ->
+
+			it "should produce a 404", (done) ->
+				@file_name = 'this_clearly_does_not_exist.csv'
+				@file_url = "#{@filestore_url}/file/#{@file_name}"
+				@opts = {
+					uri: "#{@previewer_url}/preview?fileUrl=#{@file_url}&fileName=#{@file_name}"
+					method: 'get'
+				}
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 404
+					done()
+
+		describe "without a fileUrl query param", ->
+
+			it "should produce a 400 response", (done) ->
+				@opts = {
+					uri: "#{@previewer_url}/preview?wat=yes"
+					method: 'get'
+				}
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 400
+					done()
+
+		describe "without a fileName query param", ->
+
+			it "should produce a 400 response", (done) ->
+				@opts = {
+					uri: "#{@previewer_url}/preview?fileUrl=yes"
+					method: 'get'
+				}
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 400
+					done()
+
+	# old csv endpoint
 	describe "/preview/csv", ->
 
 		describe "with a good csv file", (done) ->
