@@ -12,17 +12,15 @@ module.exports = HttpController =
 		extension = Path.extname(file_name)
 		if extension == '.csv'
 			return 'csv'
-		if extension == ''
+		if extension == '.txt'
+			return 'text'
+		else
 			bytes = new Buffer(sample.data)
 			is_binary = isBinaryFile.sync(bytes, bytes.length)
 			if is_binary == true
 				return 'binary'
 			else
 				return 'text'
-		if extension == '.txt'
-			return 'text'
-		else
-			return 'unknown'
 
 	preview: (req, res, next = (error) ->) ->
 		file_url = req.query.fileUrl
@@ -50,7 +48,7 @@ module.exports = HttpController =
 				type: preview_type
 				data: null
 				truncated: sample.truncated
-			if preview_type in ['binary', 'unknown']
+			if preview_type == 'binary'
 				preview.data = null
 				return res.status(200).send(preview)
 			if preview_type == 'text'
