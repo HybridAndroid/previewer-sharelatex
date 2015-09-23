@@ -78,6 +78,17 @@ describe "Previewer", ->
 					expect(body.source).to.equal @file_url
 					done()
 
+			it "should have a filename attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.filename).to.equal @file_name
+					done()
+
+			it "should have type 'csv'", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'type'
+					expect(body.type).to.equal 'csv'
+					done()
+
 			it "should have a truncated attribute", (done) ->
 				request @opts, (err, response, body) =>
 					expect(body).to.include.keys 'truncated'
@@ -119,6 +130,11 @@ describe "Previewer", ->
 					response.statusCode.should.equal 200
 					done()
 
+			it "should have a filename attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.filename).to.equal @file_name
+					done()
+
 			it "should have an array of rows", (done) ->
 				request @opts, (err, response, body) =>
 					expect(body.data.rows).to.be.Array
@@ -127,11 +143,183 @@ describe "Previewer", ->
 						expect(row.length).to.equal 12
 					done()
 
+			it "should have type 'csv'", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'type'
+					expect(body.type).to.equal 'csv'
+					done()
+
 			it "should have an array of labels", (done) ->
 				request @opts, (err, response, body) =>
 					expect(body.data.labels).to.be.Array
 					expect(body.data.labels.length).to.equal 12
 					done()
+
+			it "should have a truncated attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'truncated'
+					expect(body.truncated).to.equal false
+					done()
+
+		describe "with a binary file", ->
+
+			beforeEach ->
+				@file_name = 'hello-world-in-python'
+				@file_url = "#{@filestore_url}/file/#{@file_name}"
+				@opts =
+					uri: "#{@previewer_url}/preview?fileUrl=#{@file_url}&fileName=#{@file_name}"
+					method: 'get'
+					json: true
+
+			it "should produce a 200 response", (done) ->
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 200
+					done()
+
+			it "should have a filename attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.filename).to.equal @file_name
+					done()
+
+			it "should have type 'binary'", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'type'
+					expect(body.type).to.equal 'binary'
+					done()
+
+			it "should have a null data property", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'data'
+					expect(body.data).to.equal null
+					done()
+
+			it "should have a truncated attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'truncated'
+					expect(body.truncated).to.equal false
+					done()
+
+		describe "with a .txt file", ->
+
+			beforeEach ->
+				@file_name = 'prose.txt'
+				@file_url = "#{@filestore_url}/file/#{@file_name}"
+				@opts =
+					uri: "#{@previewer_url}/preview?fileUrl=#{@file_url}&fileName=#{@file_name}"
+					method: 'get'
+					json: true
+
+			it "should produce a 200 response", (done) ->
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 200
+					done()
+
+			it "should have a filename attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.filename).to.equal @file_name
+					done()
+
+			it "should have type 'text'", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'type'
+					expect(body.type).to.equal 'text'
+					done()
+
+			it "should have a text data property", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'data'
+					expect(body.data).to.be.String
+					expect(body.data.slice(0, 8)).to.equal 'hey this'
+					done()
+
+			it "should have a truncated attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'truncated'
+					expect(body.truncated).to.equal false
+					done()
+
+		describe "with a .log file", ->
+
+			beforeEach ->
+				@file_name = 'some.log'
+				@file_url = "#{@filestore_url}/file/#{@file_name}"
+				@opts =
+					uri: "#{@previewer_url}/preview?fileUrl=#{@file_url}&fileName=#{@file_name}"
+					method: 'get'
+					json: true
+
+			it "should produce a 200 response", (done) ->
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 200
+					done()
+
+			it "should have a filename attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.filename).to.equal @file_name
+					done()
+
+			it "should have type 'text'", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'type'
+					expect(body.type).to.equal 'text'
+					done()
+
+			it "should have a text data property", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'data'
+					expect(body.data).to.be.String
+					expect(body.data.slice(0, 8)).to.equal '2015-08-'
+					done()
+
+			it "should have a truncated attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'truncated'
+					expect(body.truncated).to.equal false
+					done()
+
+		describe "with an extension-less text file", ->
+
+			beforeEach ->
+				@file_name = 'prose'
+				@file_url = "#{@filestore_url}/file/#{@file_name}"
+				@opts =
+					uri: "#{@previewer_url}/preview?fileUrl=#{@file_url}&fileName=#{@file_name}"
+					method: 'get'
+					json: true
+
+			it "should produce a 200 response", (done) ->
+				request @opts, (err, response, body) =>
+					expect(err).to.equal null
+					response.statusCode.should.equal 200
+					done()
+
+			it "should have a filename attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body.filename).to.equal @file_name
+					done()
+
+			it "should have type 'text'", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'type'
+					expect(body.type).to.equal 'text'
+					done()
+
+			it "should have a text data property", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'data'
+					expect(body.data).to.be.String
+					expect(body.data.slice(0, 8)).to.equal 'hey this'
+					done()
+
+			it "should have a truncated attribute", (done) ->
+				request @opts, (err, response, body) =>
+					expect(body).to.include.keys 'truncated'
+					expect(body.truncated).to.equal false
+					done()
+
 
 		describe "with a non-existant file", ->
 
