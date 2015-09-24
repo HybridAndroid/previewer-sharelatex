@@ -6,6 +6,7 @@ chai.should()
 expect = chai.expect
 modulePath = require('path').join __dirname, '../../../app/js/HttpController'
 ObjectId = require("mongojs").ObjectId
+fs = require('fs')
 
 describe "HttpController", ->
 
@@ -69,37 +70,157 @@ describe "HttpController", ->
 
 		describe "with a fileUrl and fileName query parameter", ->
 
-			it "should produce a 200 response", (done) ->
-				@res.status = (code) =>
-					send: (data) =>
-						code.should.equal 200
-						data.type.should.equal 'csv'
-						data.source.should.equal @file_url
-						data.filename.should.equal @file_name
-						done()
-				@HttpController.preview @req, @res
+			describe "with a csv file", ->
 
-			it "should use the fileUrl query to get Sample from Filestore", (done) ->
-				@res.status = (code) =>
-					send: (data) =>
-						@FilestoreHandler.getSample.calledWith(@file_url).should.equal true
-						done()
-				@HttpController.preview @req, @res
+				it "should produce a 200 response of the correct type", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							code.should.equal 200
+							data.type.should.equal 'csv'
+							data.source.should.equal @file_url
+							data.filename.should.equal @file_name
+							done()
+					@HttpController.preview @req, @res
 
-			it "should call _get_preview_type", (done) ->
-				@res.status = (code) =>
-					send: (data) =>
-						@HttpController._get_preview_type.calledOnce.should.equal true
-						@HttpController._get_preview_type.calledWith(@file_name, @sample).should.equal true
-						done()
-				@HttpController.preview @req, @res
+				it "should use the fileUrl query to get Sample from Filestore", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							@FilestoreHandler.getSample.calledWith(@file_url).should.equal true
+							done()
+					@HttpController.preview @req, @res
 
-			it "should provide the sample data to the CsvSniffer", (done) ->
-				@res.status = (code) =>
-					send: (data) =>
-						@CsvSniffer.sniff.calledWith('somedata').should.equal true
-						done()
-				@HttpController.preview @req, @res
+				it "should call _get_preview_type", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							@HttpController._get_preview_type.calledOnce.should.equal true
+							@HttpController._get_preview_type.calledWith(@file_name, @sample).should.equal true
+							done()
+					@HttpController.preview @req, @res
+
+				it "should provide the sample data to the CsvSniffer", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							@CsvSniffer.sniff.calledWith('somedata').should.equal true
+							done()
+					@HttpController.preview @req, @res
+
+			describe "with a text file", ->
+
+				beforeEach ->
+					@file_url = "http://example.com/xiyueushqs"
+					@file_name = "someFile.txt"
+					@req.query =
+						fileUrl: @file_url
+						fileName: @file_name
+					@sample =
+						data: 'somedata'
+						truncated: false
+					@FilestoreHandler.getSample.callsArgWith(1, null, @sample)
+					@CsvSniffer.sniff.callsArgWith(1, null, @details)
+
+				it "should produce a 200 response of the correct type", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							code.should.equal 200
+							data.type.should.equal 'text'
+							data.source.should.equal @file_url
+							data.filename.should.equal @file_name
+							done()
+					@HttpController.preview @req, @res
+
+				it "should use the fileUrl query to get Sample from Filestore", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							@FilestoreHandler.getSample.calledWith(@file_url).should.equal true
+							done()
+					@HttpController.preview @req, @res
+
+				it "should call _get_preview_type", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							@HttpController._get_preview_type.calledOnce.should.equal true
+							@HttpController._get_preview_type.calledWith(@file_name, @sample).should.equal true
+							done()
+					@HttpController.preview @req, @res
+
+			describe "with an extensionless text file", ->
+
+				beforeEach ->
+					@file_url = "http://example.com/xiyueushqs"
+					@file_name = "someFile"
+					@req.query =
+						fileUrl: @file_url
+						fileName: @file_name
+					@sample =
+						data: 'somedata'
+						truncated: false
+					@FilestoreHandler.getSample.callsArgWith(1, null, @sample)
+					@CsvSniffer.sniff.callsArgWith(1, null, @details)
+
+				it "should produce a 200 response of the correct type", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							code.should.equal 200
+							data.type.should.equal 'text'
+							data.source.should.equal @file_url
+							data.filename.should.equal @file_name
+							done()
+					@HttpController.preview @req, @res
+
+				it "should use the fileUrl query to get Sample from Filestore", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							@FilestoreHandler.getSample.calledWith(@file_url).should.equal true
+							done()
+					@HttpController.preview @req, @res
+
+				it "should call _get_preview_type", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							@HttpController._get_preview_type.calledOnce.should.equal true
+							@HttpController._get_preview_type.calledWith(@file_name, @sample).should.equal true
+							done()
+					@HttpController.preview @req, @res
+
+
+			describe "with an extensionless weird binary file", ->
+
+				beforeEach ->
+					@file_url = "http://example.com/xiyhshtlc"
+					@file_name = "some-program"
+					@req.query =
+						fileUrl: @file_url
+						fileName: @file_name
+					@sample =
+						data: fs.readFileSync(__dirname + '/../../fixtures/hello-world-in-python').toString('utf-8')
+						truncated: false
+					@FilestoreHandler.getSample.callsArgWith(1, null, @sample)
+					@CsvSniffer.sniff.callsArgWith(1, null, @details)
+
+				it "should produce a 200 response of the correct type", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							code.should.equal 200
+							data.type.should.equal 'binary'
+							data.source.should.equal @file_url
+							data.filename.should.equal @file_name
+							done()
+					@HttpController.preview @req, @res
+
+				it "should use the fileUrl query to get Sample from Filestore", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							@FilestoreHandler.getSample.calledWith(@file_url).should.equal true
+							done()
+					@HttpController.preview @req, @res
+
+				it "should call _get_preview_type", (done) ->
+					@res.status = (code) =>
+						send: (data) =>
+							@HttpController._get_preview_type.calledOnce.should.equal true
+							@HttpController._get_preview_type.calledWith(@file_name, @sample).should.equal true
+							done()
+					@HttpController.preview @req, @res
 
 		describe "without a fileUrl or fileName", ->
 
