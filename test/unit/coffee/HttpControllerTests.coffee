@@ -24,9 +24,11 @@ describe "HttpController", ->
 		@res =
 			send: ->
 			setHeader: ->
-		@file_url = "http://example.com/someFile.csv"
+		@file_url = "http://example.com/xiyueoauea"
+		@file_name = "someFile.csv"
 		@req.query =
 			fileUrl: @file_url
+			fileName: @file_name
 		@sample =
 			data: 'somedata'
 			truncated: false
@@ -35,6 +37,57 @@ describe "HttpController", ->
 		@FilestoreHandler.getSample.callsArgWith(1, null, @sample)
 		@CsvSniffer.sniff.callsArgWith(1, null, @details)
 
+	describe "preview", ->
+
+		describe "with a fileUrl and fileName query parameter", ->
+
+			it "should produce a 200 response", (done) ->
+				@res.status = (code) =>
+					send: (data) =>
+						code.should.equal 200
+						data.type.should.equal 'csv'
+						data.source.should.equal @file_url
+						data.filename.should.equal @file_name
+						done()
+				@HttpController.preview @req, @res
+
+			it "should use the fileUrl query to get Sample from Filestore", (done) ->
+				@res.status = (code) =>
+					send: (data) =>
+						@FilestoreHandler.getSample.calledWith(@file_url).should.equal true
+						done()
+				@HttpController.preview @req, @res
+
+			it "should provide the sample data to the CsvSniffer", (done) ->
+				@res.status = (code) =>
+					send: (data) =>
+						@CsvSniffer.sniff.calledWith('somedata').should.equal true
+						done()
+				@HttpController.preview @req, @res
+
+		describe "without a fileUrl or fileName", ->
+
+			beforeEach ->
+				@req.query = {}
+
+			it "should produce an error code", (done) ->
+				@res.status = (code) =>
+					send: (data) =>
+						code.should.equal 400
+						done()
+				@HttpController.preview @req, @res
+
+		describe "when the filestore cannot find the file", ->
+
+			it "should produce a 404 response", (done) ->
+				@FilestoreHandler.getSample.callsArgWith(1, new @Errors.NotFoundError(), null)
+				@res.sendStatus = (code) =>
+					code.should.equal 404
+					done()
+				@HttpController.preview @req, @res
+
+
+	# legacy
 	describe "previewCsv", ->
 
 		describe "with a fileUrl query parameter", ->
