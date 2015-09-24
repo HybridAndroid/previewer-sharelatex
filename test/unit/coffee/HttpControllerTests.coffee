@@ -37,6 +37,30 @@ describe "HttpController", ->
 		@FilestoreHandler.getSample.callsArgWith(1, null, @sample)
 		@CsvSniffer.sniff.callsArgWith(1, null, @details)
 
+	describe "_get_preview_type", ->
+
+		beforeEach ->
+			@test_data =
+				'csv': [
+					{filename: 'one.csv',  sample: {data: 'one,two\nthree,four'}}
+					{filename: 'two.csv',  sample: {data: 'one,two,five\nthree,four,six'}}
+				]
+				'text': [
+					{filename: 'one.txt',  sample: {data: 'one two three four'}}
+					{filename: 'one',      sample: {data: 'one two three four five'}}
+					{filename: 'some.log', sample: {data: 'a thing happened\nthen another thing'}}
+					{filename: 'data.xyz', sample: {data: 'bihueoadrgueoa hgcrlueoaddesao'}}
+				]
+				'binary': [
+					{filename: 'some-program',  sample: {data: 'óhiÇ'}}
+				]
+
+		it 'should produce the right preview-type based on supplied filename and sample', ->
+			for expected_type, examples of @test_data
+				for example in examples
+					type = @HttpController._get_preview_type(example.filename, example.sample)
+					type.should.equal expected_type
+
 	describe "preview", ->
 
 		describe "with a fileUrl and fileName query parameter", ->
