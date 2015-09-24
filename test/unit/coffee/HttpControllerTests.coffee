@@ -36,6 +36,7 @@ describe "HttpController", ->
 			truncated: false
 		@details =
 			delimiter: ','
+			records: []
 		@FilestoreHandler.getSample.callsArgWith(1, null, @sample)
 		@CsvSniffer.sniff.callsArgWith(1, null, @details)
 
@@ -54,7 +55,10 @@ describe "HttpController", ->
 					{filename: 'data.xyz', sample: {data: 'bihueoadrgueoa hgcrlueoaddesao'}}
 				]
 				'binary': [
-					{filename: 'some-program',  sample: {data: 'óhiÇ'}}
+					{
+						filename: 'some-program',
+						sample: {data: fs.readFileSync(__dirname+'/../../fixtures/hello-world-in-python').toString('utf-8')}
+					}
 				]
 
 		it 'should produce the right preview-type based on supplied filename and sample', ->
@@ -244,7 +248,37 @@ describe "HttpController", ->
 				@HttpController.preview @req, @res
 
 
-	# legacy
+describe "HttpController old", ->
+
+	beforeEach ->
+		# NOTE: isbinaryfile and path not stubbed out
+		@HttpController = SandboxedModule.require modulePath, requires:
+			"logger-sharelatex": @logger = { log: sinon.stub(), setHeader: sinon.stub() }
+			"./FilestoreHandler": @FilestoreHandler =
+				getSample: sinon.stub()
+			"./CsvSniffer": @CsvSniffer =
+				sniff: sinon.stub()
+			"./Errors": @Errors =
+				NotFoundError: sinon.stub()
+			"metrics-sharelatex":
+				inc: sinon.stub()
+		@req = {}
+		@res =
+			send: ->
+			setHeader: ->
+		@file_url = "http://example.com/xiyueoauea"
+		@file_name = "someFile.csv"
+		@req.query =
+			fileUrl: @file_url
+			fileName: @file_name
+		@sample =
+			data: 'somedata'
+			truncated: false
+		@details =
+			delimiter: ','
+		@FilestoreHandler.getSample.callsArgWith(1, null, @sample)
+		@CsvSniffer.sniff.callsArgWith(1, null, @details)
+
 	describe "previewCsv", ->
 
 		describe "with a fileUrl query parameter", ->
