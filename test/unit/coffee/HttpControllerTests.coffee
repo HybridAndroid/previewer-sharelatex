@@ -10,6 +10,7 @@ ObjectId = require("mongojs").ObjectId
 describe "HttpController", ->
 
 	beforeEach ->
+		# NOTE: isbinaryfile and path not stubbed out
 		@HttpController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex": @logger = { log: sinon.stub(), setHeader: sinon.stub() }
 			"./FilestoreHandler": @FilestoreHandler =
