@@ -64,6 +64,9 @@ describe "HttpController", ->
 
 	describe "preview", ->
 
+		beforeEach ->
+			sinon.spy(@HttpController, '_get_preview_type')
+
 		describe "with a fileUrl and fileName query parameter", ->
 
 			it "should produce a 200 response", (done) ->
@@ -80,6 +83,14 @@ describe "HttpController", ->
 				@res.status = (code) =>
 					send: (data) =>
 						@FilestoreHandler.getSample.calledWith(@file_url).should.equal true
+						done()
+				@HttpController.preview @req, @res
+
+			it "should call _get_preview_type", (done) ->
+				@res.status = (code) =>
+					send: (data) =>
+						@HttpController._get_preview_type.calledOnce.should.equal true
+						@HttpController._get_preview_type.calledWith(@file_name, @sample).should.equal true
 						done()
 				@HttpController.preview @req, @res
 
