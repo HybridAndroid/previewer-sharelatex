@@ -25,7 +25,7 @@ module.exports = FileStoreHandler =
 				logger.log file_url: file_url, "filestore could not find file"
 				err = new Errors.NotFoundError()
 				callback(err, null)
-			else if response.statusCode != 200
+			else if response.statusCode not in [200, 206]
 				logger.log file_url: file_url, code: response.statusCode, "filestore responded with non-ok status"
 				err = new Errors.FileStoreError("Unexpected response code from filestore: #{response.statusCode}")
 				callback(err, null)
