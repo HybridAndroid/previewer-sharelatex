@@ -2,6 +2,7 @@ logger = require "logger-sharelatex"
 Errors = require "./Errors"
 FilestoreHandler = require './FilestoreHandler'
 CsvSniffer = require './CsvSniffer'
+HealthChecker = require './HealthChecker'
 metrics = require 'metrics-sharelatex'
 Path = require 'path'
 isBinaryFile = require 'isbinaryfile'
@@ -113,3 +114,9 @@ module.exports = HttpController =
 		types: csv_details.types,
 		labels: csv_details.labels
 		truncated: truncated
+
+	health_check: (req, res, next = (error) ->) ->
+		HealthChecker.check (err) ->
+			if err?
+				return res.status(500).send()
+			res.status(200).send('OK')
