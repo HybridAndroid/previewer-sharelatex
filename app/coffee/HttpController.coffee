@@ -118,5 +118,5 @@ module.exports = HttpController =
 	health_check: (req, res, next = (error) ->) ->
 		HealthChecker.check (err) ->
 			if err?
-				return res.status(500).send()
+				return next(err)
 			res.status(200).send('OK')
